@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+FROM python:3.12-slim-bookworm
 ENV TZ=UTC
 
 WORKDIR /app
@@ -32,19 +32,18 @@ RUN apt-get update \
     libasound2 \
     libatspi2.0-0 \
     libxshmfence1 \
+    # Limpeza de pacotes para reduzir tamanho da imagem
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar todos os arquivos do projeto
-COPY . /app
-
-# Instalar Langflow e suas dependências usando uv
-# Especificando uma versão máxima para algumas dependências problemáticas
+# Instalar Langflow diretamente do PyPI em vez da fonte
 RUN pip install --upgrade pip && \
-    pip install "langchain<0.4.0" "langchain-community<0.4.0" && \
-    pip install .
+    pip install langflow==1.3.2
 
-# Instalar extras para PostgreSQL
+# Copiar arquivos customizados para o contêiner
+COPY src/frontend/build /app/src/frontend/build
+
+# Instalar dependências extras para PostgreSQL
 RUN pip install "psycopg2-binary" "sqlalchemy[postgresql]" "pgvector==0.3.6"
 
 # Instalar dependências adicionais específicas para workflows
@@ -53,13 +52,6 @@ RUN pip install "playwright==1.42.0"
 
 # Instalar o navegador Chromium para Playwright
 RUN playwright install --with-deps chromium
-
-# Build do frontend
-WORKDIR /app/src/frontend
-RUN npm install && npm run build
-
-# Voltar ao diretório principal
-WORKDIR /app
 
 # Configurar o ambiente para inicialização
 ENV LANGFLOW_HOST="0.0.0.0"
@@ -70,4 +62,4 @@ ENV LANGFLOW_FRONTEND_PATH="/app/src/frontend/build"
 EXPOSE 7860
 
 # Comando para iniciar o servidor
-CMD ["python", "-m", "src.backend.langflow", "run"]
+CMD ["langflow", "run"]
