@@ -36,21 +36,23 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar Langflow diretamente do PyPI em vez da fonte
-RUN pip install --upgrade pip && \
-    pip install langflow==1.3.2
-
-# Copiar o código-fonte para construir o frontend
+# Copiar o código-fonte para construir o Langflow
 COPY . /app
 
-# Construir o frontend
+# Instalar dependências do Langflow manualmente para evitar conflitos
+RUN pip install --upgrade pip setuptools wheel
+RUN pip install "langchain==0.3.10" "langchain-community==0.3.10"
+RUN pip install "langflow-base==0.3.2" "beautifulsoup4==4.12.3"
+RUN pip install "fastapi>=0.108.0,<0.110.0" "uvicorn>=0.24.0,<0.30.0" "sqlmodel>=0.0.14,<0.1.0"
+
+# Instalar dependências do frontend
 WORKDIR /app/src/frontend
 RUN npm install && npm run build
 
 # Voltar ao diretório principal
 WORKDIR /app
 
-# Instalar dependências extras para PostgreSQL
+# Instalar dependências extras para PostgreSQL e pgvector
 RUN pip install "psycopg2-binary" "sqlalchemy[postgresql]" "pgvector==0.3.6"
 
 # Instalar dependências adicionais específicas para workflows
@@ -69,4 +71,4 @@ ENV LANGFLOW_FRONTEND_PATH="/app/src/frontend/build"
 EXPOSE 7860
 
 # Comando para iniciar o servidor
-CMD ["langflow", "run"]
+CMD ["python", "-m", "src.backend.langflow", "run"]
