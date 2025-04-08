@@ -4,7 +4,7 @@ nixPkgs = ["python312", "nodejs", "playwright", "chromium"]
 [phases.install]
 cmds = [
   "pip install -e . --extra postgresql",
-  "pip install playwright autogen-ai autogenstudio typing-extensions==4.9.0",
+  "pip install playwright autogen-ai autogen autogenstudio typing-extensions==4.9.0",
   "playwright install --with-deps chromium",
   "cd src/frontend && npm install"
 ]
