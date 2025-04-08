@@ -3,7 +3,7 @@ ENV TZ=UTC
 
 WORKDIR /app
 
-# Instalar dependências necessárias incluindo as dependências do Playwright
+# Instalar dependências necessárias, incluindo as para Playwright
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y \
@@ -37,15 +37,9 @@ RUN apt-get update \
 # Copiar todos os arquivos do projeto
 COPY . /app
 
-# Instalar dependências usando uv
+# Instalar dependências principais usando uv
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=README.md,target=README.md \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    --mount=type=bind,source=src/backend/base/README.md,target=src/backend/base/README.md \
-    --mount=type=bind,source=src/backend/base/uv.lock,target=src/backend/base/uv.lock \
-    --mount=type=bind,source=src/backend/base/pyproject.toml,target=src/backend/base/pyproject.toml \
-    uv sync --frozen --no-install-project --no-dev --extra postgresql
+    uv pip install -e . --extra postgresql
 
 # Instalar dependências adicionais específicas
 RUN pip install playwright autogen-ai autogen autogenstudio typing-extensions==4.9.0

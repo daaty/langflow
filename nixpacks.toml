@@ -1,0 +1,16 @@
+[phases.setup]
+nixPkgs = ["python312", "nodejs", "playwright", "chromium"]
+
+[phases.install]
+cmds = [
+  "pip install -e . --extra postgresql",
+  "pip install playwright autogen-ai autogenstudio typing-extensions==4.9.0",
+  "playwright install --with-deps chromium",
+  "cd src/frontend && npm install"
+]
+
+[phases.build]
+cmds = ["cd src/frontend && npm run build"]
+
+[start]
+cmd = "python -m src.backend.langflow run"
