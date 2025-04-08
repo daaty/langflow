@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  langflow:
+    build:
+      context: ..
+      dockerfile: docker/easypanel.Dockerfile
+    restart: always
+    ports:
+      - "7860:7860"
+    environment:
+      - LANGFLOW_HOST=0.0.0.0
+      - LANGFLOW_PORT=7860
+      - LANGFLOW_FRONTEND_PATH=/app/src/frontend/build
+    volumes:
+      - langflow_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  langflow_data:
