@@ -40,8 +40,15 @@ RUN apt-get update \
 RUN pip install --upgrade pip && \
     pip install langflow==1.3.2
 
-# Copiar arquivos customizados para o contêiner
-COPY src/frontend/build /app/src/frontend/build
+# Copiar o código-fonte para construir o frontend
+COPY . /app
+
+# Construir o frontend
+WORKDIR /app/src/frontend
+RUN npm install && npm run build
+
+# Voltar ao diretório principal
+WORKDIR /app
 
 # Instalar dependências extras para PostgreSQL
 RUN pip install "psycopg2-binary" "sqlalchemy[postgresql]" "pgvector==0.3.6"
