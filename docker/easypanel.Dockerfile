@@ -65,6 +65,9 @@ RUN pip install "playwright==1.42.0"
 # Instalar o navegador Chromium para Playwright
 RUN playwright install --with-deps chromium
 
+# Instalar o Langflow como um pacote instalável
+RUN pip install -e .
+
 # Configurar o ambiente para inicialização
 ENV LANGFLOW_HOST="0.0.0.0"
 ENV LANGFLOW_PORT="7860"
@@ -73,5 +76,5 @@ ENV LANGFLOW_FRONTEND_PATH="/app/src/frontend/build"
 # Expor a porta para acesso ao Langflow
 EXPOSE 7860
 
-# Comando para iniciar o servidor
-CMD ["python", "-m", "src.backend.langflow", "run"]
+# Comando para iniciar o servidor (corrigido para usar o comando correto)
+CMD ["langflow", "run"]
