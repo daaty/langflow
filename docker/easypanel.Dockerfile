@@ -3,7 +3,7 @@ ENV TZ=UTC
 
 WORKDIR /app
 
-# Instalar dependências necessárias, incluindo as para Playwright
+# Instalar dependências necessárias, incluindo as bibliotecas para o Playwright
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y \
@@ -12,6 +12,7 @@ RUN apt-get update \
     npm \
     git \
     wget \
+    # Bibliotecas necessárias para o Playwright
     libglib2.0-0 \
     libnss3 \
     libnspr4 \
@@ -31,18 +32,24 @@ RUN apt-get update \
     libasound2 \
     libatspi2.0-0 \
     libxshmfence1 \
+    # Limpeza de pacotes para reduzir tamanho da imagem
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar todos os arquivos do projeto
 COPY . /app
 
-# Instalar dependências principais usando uv
+# Instalar dependências principais do Langflow usando uv
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install -e . --extra postgresql
 
-# Instalar dependências adicionais específicas
-RUN pip install playwright autogen-ai autogen autogenstudio typing-extensions==4.9.0
+# Instalar dependências adicionais específicas para workflows
+# - Instalação do autogen e suas dependências
+# - Instalação do playwright com versão específica para garantir compatibilidade
+RUN pip install pyautogen==0.8.5 autogenstudio typing-extensions==4.9.0
+RUN pip install playwright==1.42.0
+
+# Instalar o navegador Chromium para Playwright
 RUN playwright install --with-deps chromium
 
 # Build do frontend
@@ -53,6 +60,7 @@ ENV LANGFLOW_HOST="0.0.0.0"
 ENV LANGFLOW_PORT="7860"
 ENV LANGFLOW_FRONTEND_PATH="/app/src/frontend/build"
 
+# Expor a porta para acesso ao Langflow
 EXPOSE 7860
 
 # Comando para iniciar o servidor
