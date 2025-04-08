@@ -42,11 +42,14 @@ COPY src/backend/base/README.md /app/src/backend/base/
 COPY src/backend/base/pyproject.toml /app/src/backend/base/
 COPY src/backend/base/uv.lock /app/src/backend/base/
 
-# Instalar dependências principais do Langflow usando pip (evitando problemas com uv)
-RUN pip install -e .[postgresql]
-
 # Agora copiamos o restante dos arquivos
 COPY . /app
+
+# Instalar dependências principais do Langflow sem usar extras
+RUN pip install -e .
+
+# Instalar dependências PostgreSQL manualmente para evitar conflitos
+RUN pip install psycopg2-binary sqlalchemy[postgresql] pgvector==0.3.6
 
 # Instalar dependências adicionais específicas para workflows
 # - Instalação do AutoGen 0.8.5 e suas dependências
