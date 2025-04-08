@@ -59,7 +59,7 @@ WORKDIR /app
 RUN pip install "psycopg2-binary" "sqlalchemy[postgresql]" "pgvector==0.3.6"
 
 # Instalar dependências adicionais específicas para workflows
-RUN pip install "pyautogen==0.8.5" "autogenstudio" "typing-extensions==4.9.0"
+RUN pip install "autogen" "typing-extensions==4.9.0"
 RUN pip install "playwright==1.42.0"
 
 # Instalar o navegador Chromium para Playwright
