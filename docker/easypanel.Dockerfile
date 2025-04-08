@@ -12,6 +12,9 @@ RUN apt-get update \
     npm \
     git \
     wget \
+    # Dependências do PostgreSQL necessárias para psycopg2
+    libpq-dev \
+    postgresql-client \
     # Bibliotecas necessárias para o Playwright
     libglib2.0-0 \
     libnss3 \
