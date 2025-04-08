@@ -36,15 +36,20 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar todos os arquivos do projeto
+# Primeiro copiamos apenas os arquivos de configuração necessários para instalação
+COPY pyproject.toml uv.lock README.md /app/
+COPY src/backend/base/README.md /app/src/backend/base/
+COPY src/backend/base/pyproject.toml /app/src/backend/base/
+COPY src/backend/base/uv.lock /app/src/backend/base/
+
+# Instalar dependências principais do Langflow usando pip (evitando problemas com uv)
+RUN pip install -e .[postgresql]
+
+# Agora copiamos o restante dos arquivos
 COPY . /app
 
-# Instalar dependências principais do Langflow usando uv
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install -e . --extra postgresql
-
 # Instalar dependências adicionais específicas para workflows
-# - Instalação do autogen e suas dependências
+# - Instalação do AutoGen 0.8.5 e suas dependências
 # - Instalação do playwright com versão específica para garantir compatibilidade
 RUN pip install pyautogen==0.8.5 autogenstudio typing-extensions==4.9.0
 RUN pip install playwright==1.42.0
