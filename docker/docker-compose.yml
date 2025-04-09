@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  langflow:
+    build:
+      context: ../..
+      dockerfile: langflow/docker/easypanel-simple.Dockerfile
+    ports:
+      - "7860:7860"
+    environment:
+      - LANGFLOW_DATABASE_URL=postgresql://langflow:langflowpass@postgres:5432/langflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: ankane/pgvector:latest
+    environment:
+      - POSTGRES_USER=langflow
+      - POSTGRES_PASSWORD=langflowpass
+      - POSTGRES_DB=langflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

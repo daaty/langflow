@@ -24,6 +24,8 @@ RUN apt-get update \
     libasound2 \
     libatspi2.0-0 \
     libxshmfence1 \
+    # Cliente PostgreSQL para comandos e diagnóstico
+    postgresql-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -36,6 +38,16 @@ RUN playwright install --with-deps chromium
 # Configurar o ambiente para inicialização
 ENV LANGFLOW_HOST=0.0.0.0
 ENV LANGFLOW_PORT=7860
+# Este container se conectará ao PostgreSQL em um container separado
+# definido no docker-compose.yml
+
+# NOTA: Para usar PostgreSQL, você deve configurar as seguintes variáveis de ambiente no EasyPanel:
+# ENV LANGFLOW_DATABASE_URL="postgresql://username:password@postgres-host:5432/langflow"
+# 
+# Após a conexão ao banco de dados, execute o seguinte comando SQL para habilitar a extensão pgvector:
+# CREATE EXTENSION IF NOT EXISTS vector;
+#
+# O PostgreSQL deve ser executado como um serviço separado no EasyPanel ou em outro host acessível.
 
 # Voltar para o usuário não-root 
 USER user
